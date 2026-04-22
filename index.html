@@ -1,622 +1,897 @@
 <!DOCTYPE html>
-<html lang="el">
+
+<html lang="el" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Task Tracker – L'Oréal LDB</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
- @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
- *{box-sizing:border-box;margin:0;padding:0}
- body{min-height:100vh;background:#0f0f14;font-family:'DM Sans','Segoe UI',sans-serif;color:#e2e8f0}
- ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:#1a1a24}::-webkit-scrollbar-thumb{background:#333;border-radius:2px}
-/* HEADER */
-.header{background:#13131c;border-bottom:1px solid #1e1e2e;padding:18px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
-.header-left .badge{display:flex;align-items:center;gap:8px;margin-bottom:4px}
-.dot{width:8px;height:8px;border-radius:50%;background:#c8102e}
-.brand{font-size:11px;color:#64748b;letter-spacing:.12em;text-transform:uppercase;font-family:‘DM Mono’,monospace}
-.header h1{font-size:22px;font-weight:700;letter-spacing:-.02em}
-.header-right{display:flex;align-items:center;gap:12px}
-.month-summary{text-align:right}
-.month-summary .label{font-size:11px;color:#64748b}
-.month-summary .counts{font-size:13px;font-weight:600;margin-top:2px}
-.btn-new{background:#c8102e;color:#fff;border:none;padding:10px 18px;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer;font-family:‘DM Sans’,sans-serif;transition:opacity .15s}
-.btn-new:hover{opacity:.85}
-/* DATA ACTIONS */
-.data-bar{background:#13131c;border-bottom:1px solid #1e1e2e;padding:8px 28px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.btn-data{background:transparent;border:1px solid #1e1e2e;color:#64748b;padding:5px 14px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:‘DM Sans’,sans-serif;transition:all .15s}
-.btn-data:hover{background:#1e1e2e;color:#e2e8f0}
-.btn-data.import{color:#60a5fa;border-color:#1e3a5f}
-.btn-data.export{color:#10b981;border-color:#1e3d35}
-.data-hint{font-size:11px;color:#334155;margin-left:4px}
-/* MONTHS */
-.month-nav{background:#13131c;border-bottom:1px solid #1e1e2e;padding:12px 28px;display:flex;align-items:center;gap:6px;overflow-x:auto}
-.year-ctrl{display:flex;align-items:center;gap:4px;margin-right:8px}
-.btn-year{background:none;border:none;cursor:pointer;color:#64748b;font-size:16px;padding:2px 6px;transition:color .15s}
-.btn-year:hover{color:#e2e8f0}
-.year-label{font-size:12px;color:#64748b;font-family:‘DM Mono’,monospace;min-width:36px}
-.divider{width:1px;height:20px;background:#1e1e2e;margin:0 6px}
-.month-tab{padding:6px 12px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-family:‘DM Sans’,sans-serif;font-weight:500;background:transparent;color:#64748b;transition:all .15s;position:relative;white-space:nowrap}
-.month-tab:hover{background:#2a2a38;color:#e2e8f0}
-.month-tab.active{background:#c8102e;color:#fff}
-.month-dot{position:absolute;top:2px;right:2px;width:5px;height:5px;border-radius:50%;background:#f59e0b}
-/* MAIN */
-.main{padding:24px 28px;max-width:900px;margin:0 auto}
-.main-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
-.main-header h2{font-size:18px;font-weight:600}
-.filters{display:flex;gap:6px;flex-wrap:wrap}
-.filter-btn{padding:5px 14px;border-radius:20px;border:1px solid #1e1e2e;cursor:pointer;font-size:12px;font-family:‘DM Sans’,sans-serif;font-weight:500;background:transparent;color:#64748b;transition:all .15s}
-.filter-btn:hover{opacity:.8}
-.filter-btn.active-all{background:#334155;color:#e2e8f0;border-color:#334155}
-.filter-btn.active-status{border-color:var(–sc)}
-/* EMPTY */
-.empty{text-align:center;padding:60px 20px;color:#334155}
-.empty .icon{font-size:40px;margin-bottom:12px}
-.empty .title{font-size:15px;font-weight:500;margin-bottom:6px;color:#334155}
-.empty .sub{font-size:13px;color:#475569}
-/* TASK CARD */
-.tasks{display:flex;flex-direction:column;gap:10px}
-.task-card{background:#13131c;border:1px solid #1e1e2e;border-radius:12px;overflow:hidden;transition:border-color .2s}
-.task-card:hover{border-color:#2e2e42}
-.task-header{padding:16px 18px;cursor:pointer;display:flex;align-items:center;gap:14px}
-.progress-circle{position:relative;width:40px;height:40px;flex-shrink:0}
-.progress-circle svg{transform:rotate(-90deg)}
-.circle-bg{fill:none;stroke:#1e1e2e;stroke-width:3}
-.circle-fill{fill:none;stroke-width:3;transition:stroke-dashoffset .4s ease}
-.circle-pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;font-family:‘DM Mono’,monospace}
-.task-info{flex:1;min-width:0}
-.task-title-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
-.task-title{font-size:14px;font-weight:600;color:#e2e8f0}
-.tag{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:500}
-.tag-cat{background:#1e2d3d;color:#60a5fa}
-.tag-status{font-weight:600}
-.progress-bar{height:3px;background:#1e1e2e;border-radius:2px;overflow:hidden;margin-bottom:4px}
-.progress-fill{height:100%;border-radius:2px;transition:width .4s ease}
-.task-meta{font-size:11px;color:#475569}
-.task-actions{display:flex;gap:6px;flex-shrink:0}
-.btn-action{background:#1e1e2e;border:none;cursor:pointer;padding:6px 10px;border-radius:8px;font-size:12px;transition:opacity .15s;font-family:‘DM Sans’,sans-serif}
-.btn-action:hover{opacity:.75}
-.btn-action.copy{color:#94a3b8}
-.btn-action.edit{color:#94a3b8}
-.btn-action.del{color:#ef4444}
-.chevron{color:#334155;font-size:12px;flex-shrink:0;margin-left:4px}
-/* STEPS */
-.steps-section{border-top:1px solid #1e1e2e;padding:4px 18px 12px}
-.step-row{display:flex;align-items:flex-start;gap:12px;padding:8px 6px;border-radius:6px;cursor:pointer;transition:background .1s}
-.step-row:hover{background:rgba(255,255,255,.03)}
-.checkbox{width:18px;height:18px;border-radius:4px;border:2px solid #334155;background:transparent;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
-.checkbox.checked{background:#10b981;border-color:#10b981}
-.checkbox.checked::after{content:‘✓’;color:#fff;font-size:11px;font-weight:700}
-.step-num{font-family:‘DM Mono’,monospace;font-size:10px;color:#334155;margin-right:2px}
-.step-text{font-size:13px;line-height:1.5;flex:1}
-.step-text.done{color:#475569;text-decoration:line-through}
-.step-text.pending{color:#cbd5e1}
-/* MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(4px)}
-.modal{background:#13131c;border:1px solid #1e1e2e;border-radius:16px;padding:28px;width:480px;max-width:95vw;max-height:90vh;overflow-y:auto}
-.modal h3{font-size:16px;font-weight:600;margin-bottom:20px}
-.form-group{margin-bottom:14px}
-.form-label{font-size:11px;color:#64748b;display:block;margin-bottom:4px;letter-spacing:.06em;text-transform:uppercase}
-.form-row{display:flex;gap:10px}
-.form-input{width:100%;background:#0f0f14;border:1px solid #1e1e2e;border-radius:8px;padding:10px 12px;color:#e2e8f0;font-size:14px;outline:none;font-family:‘DM Sans’,sans-serif;transition:border-color .15s}
-.form-input:focus{border-color:#c8102e}
-.status-row{display:flex;gap:6px;flex-wrap:wrap}
-.btn-status{padding:6px 14px;border-radius:8px;font-size:12px;border:1px solid #1e1e2e;background:#0f0f14;cursor:pointer;font-family:‘DM Sans’,sans-serif;font-weight:500;transition:all .15s}
-.steps-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.btn-add-step{background:#1e2d3d;color:#60a5fa;border:none;padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;font-family:‘DM Sans’,sans-serif;font-weight:500}
-.step-input-row{display:flex;gap:6px;align-items:center;margin-bottom:6px}
-.step-num-label{font-size:10px;color:#334155;font-family:‘DM Mono’,monospace;width:20px;text-align:right}
-.btn-move{background:#1e1e2e;color:#475569;border:none;padding:6px 8px;border-radius:6px;font-size:11px;cursor:pointer}
-.btn-remove-step{background:#1e1e2e;color:#ef4444;border:none;padding:6px 8px;border-radius:6px;font-size:11px;cursor:pointer}
-.modal-footer{display:flex;gap:8px;margin-top:24px}
-.btn-cancel{flex:1;background:#1e1e2e;color:#94a3b8;border:none;padding:11px;border-radius:10px;font-size:13px;cursor:pointer;font-family:‘DM Sans’,sans-serif;font-weight:500}
-.btn-save{flex:2;background:#c8102e;color:#fff;border:none;padding:11px;border-radius:10px;font-size:13px;cursor:pointer;font-family:‘DM Sans’,sans-serif;font-weight:500;transition:opacity .15s}
-.btn-save:disabled{background:#1e1e2e;color:#475569;cursor:not-allowed}
-.btn-save:not(:disabled):hover{opacity:.85}
-/* COPY MODAL */
-.copy-modal{width:340px}
-.copy-modal p{font-size:13px;color:#64748b;margin-bottom:20px}
-.copy-modal .note{font-size:12px;color:#475569;margin-bottom:20px}
-/* NOTIF */
-.notif{position:fixed;bottom:24px;right:24px;background:#1e2d3d;border:1px solid #10b981;color:#10b981;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:500;z-index:200;animation:slideUp .3s ease}
-@keyframes slideUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+/* ── VARIABLES ─────────────────────────────────────────────── */
+[data-theme="dark"]{
+--bg:#0d0d13;--surface:#13131e;--surface2:#1a1a28;--surface3:#222234;
+--border:#1e1e30;--border2:#2a2a40;
+--text:#e2e8f0;--text2:#94a3b8;--text3:#64748b;--text4:#334155;
+--accent:#c8102e;--accent2:#a00d24;
+--green:#10b981;--yellow:#f59e0b;--red:#ef4444;--blue:#60a5fa;--purple:#a78bfa;--orange:#fb923c;
+--shadow:0 8px 32px rgba(0,0,0,.5);
+}
+[data-theme="light"]{
+--bg:#f1f5f9;--surface:#ffffff;--surface2:#f8fafc;--surface3:#f1f5f9;
+--border:#e2e8f0;--border2:#cbd5e1;
+--text:#0f172a;--text2:#475569;--text3:#64748b;--text4:#94a3b8;
+--accent:#c8102e;--accent2:#a00d24;
+--green:#059669;--yellow:#d97706;--red:#dc2626;--blue:#2563eb;--purple:#7c3aed;--orange:#ea580c;
+--shadow:0 8px 32px rgba(0,0,0,.1);
+}
+/* ── RESET ─────────────────────────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0}
+body{min-height:100vh;background:var(--bg);font-family:'DM Sans','Segoe UI',system-ui,sans-serif;color:var(--text);font-size:14px;transition:background .25s,color .25s}
+::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+input,button,select,textarea{font-family:inherit}
+/* ── HEADER ─────────────────────────────────────────────────── */
+.hdr{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;gap:12px}
+.hdr-l{display:flex;align-items:center;gap:16px}
+.logo{display:flex;align-items:center;gap:8px;text-decoration:none}
+.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0}
+.logo-brand{font-size:10px;color:var(--text3);letter-spacing:.14em;text-transform:uppercase;font-family:'DM Mono',monospace}
+.logo-title{font-size:17px;font-weight:700;letter-spacing:-.025em;color:var(--text)}
+.nav{display:flex;gap:2px;background:var(--surface2);padding:3px;border-radius:10px;border:1px solid var(--border)}
+.ntab{padding:5px 14px;border-radius:7px;border:none;cursor:pointer;font-size:12px;font-weight:500;background:transparent;color:var(--text3);transition:all .15s}
+.ntab.on{background:var(--surface);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.hdr-r{display:flex;align-items:center;gap:8px}
+.srch-w{position:relative}
+.srch{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:7px 11px 7px 32px;font-size:12px;color:var(--text);outline:none;width:190px;transition:all .2s}
+.srch:focus{width:240px;border-color:var(--accent)}
+.srch::placeholder{color:var(--text3)}
+.srch-ico{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:12px;pointer-events:none}
+.ico-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text2);width:34px;height:34px;border-radius:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:all .15s}
+.ico-btn:hover{background:var(--surface3);color:var(--text)}
+.btn-new{background:var(--accent);color:#fff;border:none;padding:8px 15px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;transition:opacity .15s}
+.btn-new:hover{opacity:.88}
+.kbd{display:inline-block;background:rgba(255,255,255,.12);border-radius:4px;padding:1px 5px;font-size:10px;font-family:'DM Mono',monospace;line-height:1.5}
+/* ── DATA BAR ───────────────────────────────────────────────── */
+.dbar{background:var(--surface);border-bottom:1px solid var(--border);padding:7px 24px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.dbar-btn{background:transparent;border:1px solid var(--border);color:var(--text3);padding:4px 12px;border-radius:7px;font-size:11px;font-weight:500;cursor:pointer;transition:all .15s}
+.dbar-btn:hover{background:var(--surface2);color:var(--text)}
+.dbar-btn.exp{color:var(--green);border-color:rgba(16,185,129,.3)}
+.dbar-btn.imp{color:var(--blue);border-color:rgba(96,165,250,.3)}
+.dbar-hint{font-size:11px;color:var(--text4);margin-left:2px}
+.kbd2{display:inline-block;background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-size:10px;font-family:'DM Mono',monospace;color:var(--text3)}
+/* ── MONTH NAV ──────────────────────────────────────────────── */
+.mnav{background:var(--surface);border-bottom:1px solid var(--border);padding:9px 24px;display:flex;align-items:center;gap:5px;overflow-x:auto}
+.yr-ctl{display:flex;align-items:center;gap:2px;flex-shrink:0}
+.yr-btn{background:none;border:none;cursor:pointer;color:var(--text3);font-size:15px;padding:3px 7px;border-radius:6px;line-height:1;transition:all .15s}
+.yr-btn:hover{background:var(--surface2);color:var(--text)}
+.yr-lbl{font-size:12px;color:var(--text3);font-family:'DM Mono',monospace;min-width:36px;text-align:center}
+.mdiv{width:1px;height:18px;background:var(--border);margin:0 4px;flex-shrink:0}
+.mtab{padding:5px 10px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-weight:500;background:transparent;color:var(--text3);transition:all .15s;position:relative;white-space:nowrap;flex-shrink:0}
+.mtab:hover{background:var(--surface2);color:var(--text)}
+.mtab.on{background:var(--accent);color:#fff}
+.mdot{position:absolute;top:2px;right:2px;width:5px;height:5px;border-radius:50%;background:var(--yellow)}
+/* ── LAYOUT ─────────────────────────────────────────────────── */
+.wrap{padding:22px 24px;max-width:940px;margin:0 auto}
+.page-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px}
+.page-title{font-size:18px;font-weight:600}
+/* ── FILTERS ─────────────────────────────────────────────────── */
+.filters{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.fbtn{padding:4px 11px;border-radius:14px;border:1px solid var(--border);cursor:pointer;font-size:11px;font-weight:500;background:transparent;color:var(--text3);transition:all .15s}
+.fbtn:hover{opacity:.8}
+.fsep{width:1px;height:14px;background:var(--border);margin:0 2px}
+/* ── QUICK ADD ──────────────────────────────────────────────── */
+.qadd{display:flex;gap:8px;margin-bottom:14px}
+.qi{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:9px 13px;font-size:13px;color:var(--text);outline:none;transition:border-color .15s}
+.qi:focus{border-color:var(--accent)}
+.qi::placeholder{color:var(--text3)}
+.qbtn{background:var(--surface);border:1px solid var(--border);color:var(--text2);padding:9px 14px;border-radius:9px;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap}
+.qbtn:hover{background:var(--surface2);color:var(--text)}
+/* ── EMPTY ──────────────────────────────────────────────────── */
+.empty{text-align:center;padding:56px 20px}
+.empty-ico{font-size:38px;margin-bottom:10px}
+.empty-t{font-size:14px;font-weight:500;color:var(--text4);margin-bottom:5px}
+.empty-s{font-size:12px;color:var(--text3)}
+/* ── TASK CARDS ─────────────────────────────────────────────── */
+.tasks{display:flex;flex-direction:column;gap:8px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:border-color .2s;animation:cin .18s ease}
+.card:hover{border-color:var(--border2)}
+.card.drag-over{border-color:var(--accent)!important;box-shadow:0 0 0 2px rgba(200,16,46,.2)}
+.card.dragging{opacity:.45;transform:scale(.98)}
+@keyframes cin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.card-hdr{padding:13px 15px;cursor:grab;display:flex;align-items:center;gap:11px;user-select:none}
+.card-hdr:active{cursor:grabbing}
+.dh{color:var(--text4);font-size:15px;flex-shrink:0;line-height:1}
+/* Ring */
+.ring{position:relative;width:38px;height:38px;flex-shrink:0}
+.ring svg{transform:rotate(-90deg)}
+.rbg{fill:none;stroke:var(--border);stroke-width:3}
+.rfill{fill:none;stroke-width:3;transition:stroke-dashoffset .5s ease}
+.rpct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;font-family:'DM Mono',monospace}
+/* Info */
+.cinfo{flex:1;min-width:0}
+.ctrow{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:5px}
+.ctitle{font-size:13px;font-weight:600}
+.tag{font-size:10px;padding:2px 7px;border-radius:11px;font-weight:500;white-space:nowrap}
+.tag-rec{font-size:9px;padding:2px 7px;border-radius:10px;background:rgba(167,139,250,.15);color:var(--purple);font-weight:600;letter-spacing:.04em}
+.dl-ok{background:rgba(100,116,139,.15);color:var(--text3)}
+.dl-soon{background:rgba(245,158,11,.15);color:var(--yellow)}
+.dl-over{background:rgba(239,68,68,.15);color:var(--red)}
+.cpbar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:3px}
+.cpfill{height:100%;border-radius:2px;transition:width .4s ease}
+.cmeta{font-size:11px;color:var(--text3)}
+/* Actions */
+.cacts{display:flex;gap:4px;flex-shrink:0}
+.act{background:var(--surface2);border:1px solid var(--border);cursor:pointer;padding:5px 8px;border-radius:7px;font-size:11px;color:var(--text2);line-height:1;transition:opacity .15s}
+.act:hover{opacity:.7}
+.act.del{color:var(--red)}
+.chev{color:var(--text4);font-size:11px;flex-shrink:0;transition:transform .2s;margin-left:2px}
+.chev.op{transform:rotate(180deg)}
+/* Expanded */
+.cexp{border-top:1px solid var(--border);animation:cin .15s ease}
+.cnotes{padding:10px 15px;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);line-height:1.6;font-style:italic;background:var(--surface2)}
+.csteps{padding:4px 15px 10px}
+.srow{display:flex;align-items:flex-start;gap:10px;padding:7px 5px;border-radius:7px;cursor:pointer;transition:background .1s}
+.srow:hover{background:rgba(255,255,255,.03)}
+.chk{width:17px;height:17px;border-radius:4px;border:2px solid var(--border2);background:transparent;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;margin-top:1px}
+.chk.on{background:var(--green);border-color:var(--green)}
+.chk-mk{color:#fff;font-size:10px;font-weight:700;opacity:0;transition:opacity .12s}
+.chk.on .chk-mk{opacity:1}
+.sidx{font-family:'DM Mono',monospace;font-size:10px;color:var(--text4);flex-shrink:0;margin-top:2px;width:16px}
+.stxt{font-size:12px;line-height:1.5;flex:1}
+.stxt.done{color:var(--text3);text-decoration:line-through}
+.stxt.pend{color:var(--text2)}
+/* ── SEARCH ─────────────────────────────────────────────────── */
+.srch-res{padding:0 24px 28px;max-width:940px;margin:0 auto}
+.srch-hdr{font-size:13px;color:var(--text2);padding-top:22px;margin-bottom:14px}
+.srch-grp{margin-bottom:20px}
+.srch-grp-lbl{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;font-family:'DM Mono',monospace}
+/* ── DASHBOARD ──────────────────────────────────────────────── */
+.dash{padding:22px 24px;max-width:940px;margin:0 auto}
+.dash-t{font-size:18px;font-weight:600;margin-bottom:18px}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:10px;margin-bottom:20px}
+.scard{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:17px;transition:border-color .2s}
+.scard:hover{border-color:var(--border2)}
+.slbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:7px;font-family:'DM Mono',monospace}
+.sval{font-size:26px;font-weight:700;letter-spacing:-.025em;line-height:1}
+.ssub{font-size:11px;color:var(--text3);margin-top:4px}
+.cgrid{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:18px}
+.ccrd{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px}
+.ctit{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:14px}
+/* Bar chart */
+.bchart{display:flex;align-items:flex-end;gap:7px;height:90px}
+.bcol{display:flex;flex-direction:column;align-items:center;flex:1;height:100%;gap:3px;cursor:pointer}
+.bcol:hover .bfill{opacity:.8}
+.bval{font-size:9px;color:var(--text2);font-weight:600;font-family:'DM Mono',monospace}
+.btrack{position:relative;width:100%;flex:1}
+.bbg{position:absolute;bottom:0;width:100%;border-radius:4px 4px 0 0;background:var(--surface3);min-height:4px}
+.bfill{position:absolute;bottom:0;width:100%;border-radius:4px 4px 0 0;background:var(--green);min-height:2px;transition:height .6s ease}
+.blbl{font-size:10px;color:var(--text3);font-family:'DM Mono',monospace}
+/* Donut */
+.dnut{display:flex;flex-direction:column;align-items:center;gap:10px}
+.dleg{width:100%;display:flex;flex-direction:column;gap:6px}
+.dleg-r{display:flex;align-items:center;justify-content:space-between;font-size:11px}
+.dleg-l{display:flex;align-items:center;gap:6px;color:var(--text2)}
+.dleg-d{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.dleg-v{font-weight:600;font-family:'DM Mono',monospace;color:var(--text)}
+/* Upcoming */
+.ucrd{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px}
+.utit{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:12px}
+.urow{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border)}
+.urow:last-child{border-bottom:none}
+.udays{font-size:10px;padding:2px 7px;border-radius:8px;font-weight:600;font-family:'DM Mono',monospace;flex-shrink:0}
+.uinfo{flex:1;min-width:0}
+.uname{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.umeta{font-size:10px;color:var(--text3);margin-top:1px}
+/* ── MODALS ─────────────────────────────────────────────────── */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(5px);animation:fIn .15s ease}
+@keyframes fIn{from{opacity:0}to{opacity:1}}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;width:500px;max-width:96vw;max-height:92vh;overflow-y:auto;animation:mUp .2s ease;box-shadow:var(--shadow)}
+.modal-sm{width:360px}
+@keyframes mUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.modal h3{font-size:15px;font-weight:600;margin-bottom:16px}
+.fg{margin-bottom:11px}
+.fl{font-size:10px;color:var(--text3);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em}
+.fi{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 11px;color:var(--text);font-size:13px;outline:none;transition:border-color .15s}
+.fi:focus{border-color:var(--accent)}
+.fi::placeholder{color:var(--text3)}
+textarea.fi{resize:vertical;min-height:54px;line-height:1.5}
+.frow{display:flex;gap:10px}
+/* Status & recurring */
+.sbtns,.rbtns{display:flex;gap:5px;flex-wrap:wrap}
+.sbtn,.rbtn{padding:5px 11px;border-radius:7px;font-size:11px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;font-weight:500;color:var(--text2);transition:all .15s}
+.rbtn.on{background:rgba(167,139,250,.15);color:var(--purple);border-color:rgba(167,139,250,.35)}
+/* Tags */
+.tags-w{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:5px 7px;display:flex;flex-wrap:wrap;gap:5px;cursor:text;min-height:36px;transition:border-color .15s}
+.tags-w:focus-within{border-color:var(--accent)}
+.tp{font-size:11px;padding:2px 7px;border-radius:10px;font-weight:500;display:flex;align-items:center;gap:3px}
+.tp-x{cursor:pointer;opacity:.6;font-size:11px;line-height:1;margin-left:1px}
+.tp-x:hover{opacity:1}
+.ti{border:none;outline:none;background:transparent;color:var(--text);font-size:12px;min-width:70px;flex:1;padding:2px}
+.ti::placeholder{color:var(--text3)}
+/* Steps form */
+.sfhdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
+.add-step{background:rgba(96,165,250,.15);color:var(--blue);border:none;padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;font-weight:500;transition:opacity .15s}
+.add-step:hover{opacity:.8}
+.sfrow{display:flex;gap:4px;align-items:center;margin-bottom:5px}
+.sfnum{font-size:10px;color:var(--text4);font-family:'DM Mono',monospace;width:17px;text-align:right;flex-shrink:0}
+.bsm{background:var(--surface3);border:1px solid var(--border);color:var(--text3);padding:5px 7px;border-radius:6px;font-size:11px;cursor:pointer;line-height:1;transition:opacity .15s}
+.bsm:hover{opacity:.75}
+.bsm.d{color:var(--red)}
+/* Footer */
+.mft{display:flex;gap:8px;margin-top:18px}
+.btn-cl{flex:1;background:var(--surface2);color:var(--text2);border:1px solid var(--border);padding:10px;border-radius:9px;font-size:13px;cursor:pointer;font-weight:500;transition:opacity .15s}
+.btn-cl:hover{opacity:.8}
+.btn-ok{flex:2;background:var(--accent);color:#fff;border:none;padding:10px;border-radius:9px;font-size:13px;cursor:pointer;font-weight:600;transition:opacity .15s}
+.btn-ok:hover:not(:disabled){opacity:.88}
+.btn-ok:disabled{background:var(--surface2);color:var(--text3);cursor:not-allowed}
+/* ── NOTIF ──────────────────────────────────────────────────── */
+.ntf{position:fixed;bottom:20px;right:20px;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:10px 17px;border-radius:10px;font-size:12px;font-weight:500;z-index:300;animation:mUp .2s ease;box-shadow:var(--shadow);max-width:280px}
+.ntf.ok{border-color:rgba(16,185,129,.4);color:var(--green)}
+.ntf.inf{border-color:rgba(96,165,250,.4);color:var(--blue)}
+/* ── CONFETTI ───────────────────────────────────────────────── */
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:500;display:none}
+/* ── RESPONSIVE ─────────────────────────────────────────────── */
+@media(max-width:620px){
+.hdr,.dbar,.mnav,.wrap,.dash,.srch-res{padding-left:14px;padding-right:14px}
+.cgrid{grid-template-columns:1fr}
+.srch{width:130px}.srch:focus{width:170px}
+.logo-title{font-size:15px}
+}
 </style>
 </head>
 <body>
+<canvas id="confetti"></canvas>
+
 <!-- HEADER -->
-<div class="header">
-<div class="header-left">
-<div class="badge"><div class="dot"></div><span class="brand">L'Oréal LDB</span></div>
-<h1>Task Tracker</h1>
+
+<div class="hdr">
+<div class="hdr-l">
+<div class="logo">
+<div class="logo-dot"></div>
+<span class="logo-brand">L'Oréal LDB</span>
+<span class="logo-title">&nbsp;Task Tracker</span>
 </div>
-<div class="header-right">
-<div class="month-summary">
-<div class="label">Αυτό τον μήνα</div>
-<div class="counts" id="monthCounts"></div>
-</div>
-<button class="btn-new" onclick="openForm()">+ Νέο Task</button>
+<div class="nav">
+<button class="ntab on" id="tTasks" onclick="gv('tasks')">📋 Tasks</button>
+<button class="ntab" id="tDash" onclick="gv('dashboard')">📊 Dashboard</button>
 </div>
 </div>
+<div class="hdr-r">
+<div class="srch-w">
+<span class="srch-ico">🔍</span>
+<input class="srch" id="sInput" placeholder="Αναζήτηση…" oninput="doSearch(this.value)">
+</div>
+<button class="ico-btn" id="thBtn" onclick="toggleTheme()" title="Toggle theme">☀️</button>
+<button class="btn-new" onclick="openForm()">+ Νέο <span class="kbd">N</span></button>
+</div>
+</div>
+
 <!-- DATA BAR -->
-<div class="data-bar">
-<button class="btn-data export" onclick="exportData()">⬇ Export JSON</button>
-<button class="btn-data import" onclick="document.getElementById('importFile').click()">⬆ Import JSON</button>
-<input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
-<span class="data-hint">💡 Κάνε Export τακτικά για backup</span>
+
+<div class="dbar">
+<button class="dbar-btn exp" onclick="exportData()">⬇ Export JSON</button>
+<button class="dbar-btn imp" onclick="document.getElementById('iFile').click()">⬆ Import JSON</button>
+<input type="file" id="iFile" accept=".json" style="display:none" onchange="importData(event)">
+<span class="dbar-hint"><span class="kbd2">N</span> νέο &nbsp;<span class="kbd2">Esc</span> κλείσιμο &nbsp;<span class="kbd2">/</span> αναζήτηση</span>
 </div>
+
 <!-- MONTH NAV -->
-<div class="month-nav">
-<div class="year-ctrl">
-<button class="btn-year" onclick="changeYear(-1)">‹</button>
-<span class="year-label" id="yearLabel"></span>
-<button class="btn-year" onclick="changeYear(1)">›</button>
+
+<div class="mnav" id="mnav">
+<div class="yr-ctl">
+<button class="yr-btn" onclick="chgYear(-1)">‹</button>
+<span class="yr-lbl" id="yrLbl"></span>
+<button class="yr-btn" onclick="chgYear(1)">›</button>
 </div>
-<div class="divider"></div>
-<div id="monthTabs"></div>
+<div class="mdiv"></div>
+<div id="mTabs" style="display:flex;gap:4px"></div>
 </div>
-<!-- MAIN -->
-<div class="main">
-<div class="main-header">
-<h2 id="mainTitle"></h2>
-<div class="filters" id="filters"></div>
-</div>
-<div id="taskList"></div>
-</div>
+
+<!-- CONTENT -->
+
+<div id="ct"></div>
+
 <!-- FORM MODAL -->
-<div class="modal-overlay" id="formModal" style="display:none" onclick="closeFormIfOverlay(event)">
-<div class="modal">
-<h3 id="formTitle">Νέο Task</h3>
-<div class="form-group">
-<label class="form-label">Τίτλος *</label>
-<input class="form-input" id="fTitle" placeholder="π.χ. Cycle 3 – Asset Translation">
+
+<div class="ov" id="fOv" style="display:none" onclick="if(event.target===this)closeForm()">
+<div class="modal" onclick="event.stopPropagation()">
+<h3 id="fTit">Νέο Task</h3>
+<div class="fg"><label class="fl">Τίτλος *</label><input class="fi" id="fTitle" placeholder="π.χ. Cycle 3 – Asset Translation" oninput="updSave()"></div>
+<div class="frow">
+<div class="fg" style="flex:1"><label class="fl">Κατηγορία</label><input class="fi" id="fCat" placeholder="π.χ. Content, Campaign…"></div>
+<div class="fg" style="width:128px"><label class="fl">Deadline</label><input class="fi" id="fDl" type="date"></div>
 </div>
-<div class="form-row">
-<div class="form-group" style="flex:1">
-<label class="form-label">Κατηγορία</label>
-<input class="form-input" id="fCategory" placeholder="π.χ. Content, Campaign…">
+<div class="fg"><label class="fl">Notes</label><textarea class="fi" id="fNotes" placeholder="Επιπλέον context, παρατηρήσεις…" rows="2"></textarea></div>
+<div class="fg"><label class="fl">Status</label><div class="sbtns" id="sBtns"></div></div>
+<div class="fg"><label class="fl">Recurring</label><div class="rbtns" id="rBtns"></div></div>
+<div class="fg"><label class="fl">Tags <span style="color:var(--text4);font-size:10px">(Enter για προσθήκη)</span></label><div class="tags-w" id="tagsW" onclick="document.getElementById('tagI').focus()"><input class="ti" id="tagI" placeholder="Πρόσθεσε tag…" onkeydown="tagKey(event)"></div></div>
+<div class="fg">
+<div class="sfhdr"><label class="fl" style="margin:0">Βήματα</label><button class="add-step" onclick="addSI()">+ Βήμα</button></div>
+<div id="sInputs"></div>
 </div>
-<div class="form-group" style="width:130px">
-<label class="form-label">Deadline</label>
-<input class="form-input" id="fDeadline" type="date">
-</div>
-</div>
-<div class="form-group">
-<label class="form-label">Status</label>
-<div class="status-row" id="statusRow"></div>
-</div>
-<div class="form-group">
-<div class="steps-header">
-<label class="form-label" style="margin:0">Βήματα</label>
-<button class="btn-add-step" onclick="addStepInput()">+ Βήμα</button>
-</div>
-<div id="stepInputs"></div>
-</div>
-<div class="modal-footer">
-<button class="btn-cancel" onclick="closeForm()">Άκυρο</button>
-<button class="btn-save" id="btnSave" onclick="saveTask()">Προσθήκη Task</button>
+<div class="mft">
+<button class="btn-cl" onclick="closeForm()">Άκυρο</button>
+<button class="btn-ok" id="bSave" onclick="saveTask()" disabled>Προσθήκη</button>
 </div>
 </div>
 </div>
+
 <!-- COPY MODAL -->
-<div class="modal-overlay" id="copyModal" style="display:none" onclick="closeCopyIfOverlay(event)">
-<div class="modal copy-modal">
+
+<div class="ov" id="cpOv" style="display:none" onclick="if(event.target===this)closeCp()">
+<div class="modal modal-sm" onclick="event.stopPropagation()">
 <h3>Αντιγραφή Task</h3>
-<p>Επίλεξε σε ποιον μήνα θέλεις να αντιγραφεί</p>
-<div class="form-row">
-<div class="form-group" style="flex:1">
-<label class="form-label">Μήνας</label>
-<select class="form-input" id="copyMonth"></select>
+<p style="font-size:13px;color:var(--text2);margin-bottom:16px">Επίλεξε τον μήνα προορισμού. Τα βήματα θα αντιγραφούν ως unchecked.</p>
+<div class="frow">
+<div class="fg" style="flex:1"><label class="fl">Μήνας</label><select class="fi" id="cpM"></select></div>
+<div class="fg" style="width:88px"><label class="fl">Έτος</label><input class="fi" id="cpY" type="number"></div>
 </div>
-<div class="form-group" style="width:90px">
-<label class="form-label">Έτος</label>
-<input class="form-input" id="copyYear" type="number">
-</div>
-</div>
-<p class="note">Τα βήματα θα αντιγραφούν ως αδοκίμαστα (unchecked)</p>
-<div class="modal-footer">
-<button class="btn-cancel" onclick="closeCopyModal()">Άκυρο</button>
-<button class="btn-save" onclick="confirmCopy()">Αντιγραφή</button>
+<div class="mft">
+<button class="btn-cl" onclick="closeCp()">Άκυρο</button>
+<button class="btn-ok" onclick="doCp()">Αντιγραφή</button>
 </div>
 </div>
 </div>
+
 <script>
-const MONTHS_SHORT = ["Ιαν","Φεβ","Μαρ","Απρ","Μαΐ","Ιουν","Ιουλ","Αυγ","Σεπ","Οκτ","Νοε","Δεκ"];
-const MONTHS_FULL = ["Ιανουάριος","Φεβρουάριος","Μάρτιος","Απρίλιος","Μάιος","Ιούνιος","Ιούλιος","Αύγουστος","Σεπτέμβριος","Οκτώβριος","Νοέμβριος","Δεκέμβριος"];
-const STATUS_LIST = ["Not Started","In Progress","Done","Blocked"];
-const STATUS_COLORS = {"Not Started":"#94a3b8","In Progress":"#f59e0b","Done":"#10b981","Blocked":"#ef4444"};
-const STORAGE_KEY = "loreal-tasktracker-v1";
-let state = {
- year: new Date().getFullYear(),
- month: new Date().getMonth(),
- filter: "All",
- data: {},
- editingId: null,
- copyTaskId: null,
- formStatus: "Not Started",
- stepCounter: 0
+// ── CONSTANTS ─────────────────────────────────────────────────────────────────
+const MS=["Ιαν","Φεβ","Μαρ","Απρ","Μαΐ","Ιουν","Ιουλ","Αυγ","Σεπ","Οκτ","Νοε","Δεκ"];
+const MF=["Ιανουάριος","Φεβρουάριος","Μάρτιος","Απρίλιος","Μάιος","Ιούνιος","Ιούλιος","Αύγουστος","Σεπτέμβριος","Οκτώβριος","Νοέμβριος","Δεκέμβριος"];
+const SL=["Not Started","In Progress","Done","Blocked"];
+const SC={"Not Started":"#94a3b8","In Progress":"#f59e0b","Done":"#10b981","Blocked":"#ef4444"};
+const CATP=["#3b82f6","#10b981","#f59e0b","#8b5cf6","#ec4899","#06b6d4","#f97316","#84cc16","#ef4444","#a78bfa"];
+const TAGP=["#60a5fa","#34d399","#fbbf24","#c084fc","#f472b6","#22d3ee","#fb923c","#a3e635","#e879f9","#4ade80"];
+const SK="loreal-tt-v3";
+const NOW=new Date();
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+const S={
+theme:localStorage.getItem("tt-th")||"dark",
+view:"tasks",year:NOW.getFullYear(),month:NOW.getMonth(),
+filter:"All",fTag:null,search:"",
+data:{},
+eid:null,cpid:null,
+fs:"Not Started",fr:null,ftags:[],fsc:0,
+drag:null
 };
-function loadData() {
- try {
-   const raw = localStorage.getItem(STORAGE_KEY);
-   if (raw) state.data = JSON.parse(raw);
-   else {
-     const key = `${state.year}-${state.month}`;
-     state.data[key] = [{
-       id: "demo1", title: "Cycle 3 – Asset Translation & Upload", category: "Content",
-       deadline: "", status: "In Progress", expanded: false,
-       steps: [
-         {id:"s1",text:"Ζητάω από PMs να φτιάξουν PPT με translations",done:true},
-         {id:"s2",text:"Derivative assets από Opera σε ελληνικό φάκελο",done:true},
-         {id:"s3",text:"Στέλνω assets στον Μπαλάσκα",done:false},
-         {id:"s4",text:"Λαμβάνω επιβεβαίωση από Μπαλάσκα",done:false},
-         {id:"s5",text:"Ανεβάζω assets στο Opera",done:false},
-         {id:"s6",text:"Ενημερώνω PMs να κλείσουν tasks στο Salsify",done:false}
-       ]
-     }];
-     saveData();
-   }
- } catch(e) { state.data = {}; }
+
+// ── UTILS ─────────────────────────────────────────────────────────────────────
+const uid=()=>"t"+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+const sid=()=>"s"+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+const esc=s=>String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const mk=(y,m)=>`${y}-${m}`;
+const ck=()=>mk(S.year,S.month);
+const gt=(k)=>S.data[k||ck()]||[];
+const st=(t,k)=>{S.data[k||ck()]=t;sv();};
+function catC(c){if(!c)return"#64748b";let h=0;for(const x of c)h=(h*31+x.charCodeAt(0))>>>0;return CATP[h%CATP.length];}
+function tagC(t){if(!t)return"#64748b";let h=5381;for(const x of t)h=((h<<5)+h+x.charCodeAt(0))>>>0;return TAGP[h%TAGP.length];}
+function pct(task){if(!(task.steps&&task.steps.length))return 0;return Math.round(task.steps.filter(s=>s.done).length/task.steps.length*100);}
+function dlBadge(dl){
+if(!dl)return"";
+const diff=Math.ceil((new Date(dl)-new Date().setHours(0,0,0,0))/86400000);
+if(diff<0)return`<span class="tag dl-over">⚠ ${Math.abs(diff)}d overdue</span>`;
+if(diff<=3)return`<span class="tag dl-soon">⏰ ${diff}d left</span>`;
+const[,m,d]=dl.split("-");return`<span class="tag dl-ok">📅 ${d}/${m}</span>`;
 }
-function saveData() {
- try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.data)); } catch(e) {}
+function fmtD(d){if(!d)return"";const[y,m,dy]=d.split("-");return`${dy}/${m}/${y}`;}
+
+// ── PERSIST ───────────────────────────────────────────────────────────────────
+function sv(){try{localStorage.setItem(SK,JSON.stringify(S.data));}catch(e){}}
+function load(){
+try{const r=localStorage.getItem(SK);if(r){S.data=JSON.parse(r);return;}}catch(e){}
+const k=ck();
+S.data[k]=[{
+id:"demo1",title:"Cycle 3 – Asset Translation & Upload",category:"Content",
+deadline:"",status:"In Progress",expanded:false,
+notes:"Coordination με Μπαλάσκα. Προθεσμία τέλη μήνα.",
+tags:["Opera","Salsify","PMs"],recurring:null,
+steps:[
+{id:"s1",text:"Ζητάω από PMs να φτιάξουν PPT με translations",done:true},
+{id:"s2",text:"Derivative assets από Opera σε ελληνικό φάκελο",done:true},
+{id:"s3",text:"Στέλνω assets στον Μπαλάσκα",done:false},
+{id:"s4",text:"Λαμβάνω επιβεβαίωση από Μπαλάσκα",done:false},
+{id:"s5",text:"Ανεβάζω assets στο Opera",done:false},
+{id:"s6",text:"Ενημερώνω PMs να κλείσουν tasks στο Salsify",done:false}
+]
+}];
+sv();
 }
-function getMonthKey(y, m) { return `${y}-${m}`; }
-function currentKey() { return getMonthKey(state.year, state.month); }
-function getTasks() { return state.data[currentKey()] || []; }
-function setTasks(tasks) { state.data[currentKey()] = tasks; saveData(); }
-function genId() { return "t" + Date.now() + Math.random().toString(36).slice(2,6); }
-function genStepId() { return "s" + Date.now() + Math.random().toString(36).slice(2,6); }
-function progress(task) {
- if (!task.steps.length) return 0;
- return Math.round(task.steps.filter(s => s.done).length / task.steps.length * 100);
+
+// ── THEME ─────────────────────────────────────────────────────────────────────
+function applyTheme(){
+document.documentElement.setAttribute("data-theme",S.theme);
+const b=document.getElementById("thBtn");
+if(b)b.textContent=S.theme==="dark"?"☀️":"🌙";
 }
-// ─── RENDER ───────────────────────────────────────────────────────────────────
-function render() {
- renderYearLabel();
- renderMonthTabs();
- renderMainHeader();
- renderFilters();
- renderTasks();
- renderMonthCounts();
+function toggleTheme(){S.theme=S.theme==="dark"?"light":"dark";localStorage.setItem("tt-th",S.theme);applyTheme();}
+
+// ── RECURRING ─────────────────────────────────────────────────────────────────
+function applyRec(y,m){
+const k=mk(y,m);
+if(!S.data[k])S.data[k]=[];
+const cur=S.data[k];
+const added=[];
+for(let d=1;d<=2;d++){
+let pm=m-d,py=y;if(pm<0){pm+=12;py--;}
+const pk=mk(py,pm);
+(S.data[pk]||[]).forEach(t=>{
+if(!t.recurring)return;
+if(t.recurring==="monthly"&&d!==1)return;
+if(t.recurring==="bimonthly"&&d!==2)return;
+const exists=cur.some(e=>e.title===t.title&&e._rf===t.id);
+if(!exists){
+cur.push({...t,id:uid(),expanded:false,status:"Not Started",_rf:t.id,
+steps:(t.steps||[]).map(s=>({...s,id:sid(),done:false}))});
+added.push(t.title);
 }
-function renderYearLabel() {
- document.getElementById("yearLabel").textContent = state.year;
+});
 }
-function renderMonthTabs() {
- const container = document.getElementById("monthTabs");
- container.innerHTML = "";
- MONTHS_SHORT.forEach((m, i) => {
-   const key = getMonthKey(state.year, i);
-   const count = (state.data[key] || []).length;
-   const isActive = i === state.month;
-   const btn = document.createElement("button");
-   btn.className = "month-tab" + (isActive ? " active" : "");
-   btn.textContent = m;
-   btn.onclick = () => { state.month = i; state.filter = "All"; render(); };
-   if (count > 0 && !isActive) {
-     const dot = document.createElement("span");
-     dot.className = "month-dot";
-     btn.appendChild(dot);
-   }
-   container.appendChild(btn);
- });
+if(added.length){sv();notif(`${added.length} recurring task${added.length>1?"s":""} προστέθηκε αυτόματα 🔁`,"inf");}
 }
-function renderMainHeader() {
- document.getElementById("mainTitle").textContent = `${MONTHS_FULL[state.month]} ${state.year}`;
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function render(){
+applyTheme();
+renderMnav();
+const mn=document.getElementById("mnav");
+if(S.view==="dashboard"){mn.style.display="none";renderDash();}
+else if(S.search){mn.style.display="none";renderSearch();}
+else{mn.style.display="flex";renderTasks();}
+document.getElementById("tTasks").className="ntab"+(S.view==="tasks"||S.search?" on":"");
+document.getElementById("tDash").className="ntab"+(S.view==="dashboard"?" on":"");
 }
-function renderMonthCounts() {
- const tasks = getTasks();
- const done = tasks.filter(t => t.status === "Done").length;
- const inProg = tasks.filter(t => t.status === "In Progress").length;
- let html = `<span style="color:#10b981">${done} done</span>`;
- if (inProg > 0) html += ` <span style="color:#f59e0b;margin-left:8px">${inProg} σε εξέλιξη</span>`;
- if (done === 0 && inProg === 0) html = `<span style="color:#334155">${tasks.length} tasks</span>`;
- document.getElementById("monthCounts").innerHTML = html;
+
+function renderMnav(){
+document.getElementById("yrLbl").textContent=S.year;
+const el=document.getElementById("mTabs");
+el.innerHTML=MS.map((m,i)=>{
+const cnt=(S.data[mk(S.year,i)]||[]).length;
+const on=i===S.month&&S.view==="tasks";
+return`<button class="mtab${on?" on":""}" onclick="selM(${i})">${m}${cnt>0&&!on?'<span class="mdot"></span>':""}</button>`;
+}).join("");
 }
-function renderFilters() {
- const container = document.getElementById("filters");
- const options = ["All", ...STATUS_LIST];
- container.innerHTML = options.map(s => {
-   const isActive = state.filter === s;
-   const color = s === "All" ? null : STATUS_COLORS[s];
-   let style = "";
-   if (isActive && s === "All") style = `background:#334155;color:#e2e8f0;border-color:#334155`;
-   else if (isActive) style = `background:${color}22;color:${color};border-color:${color}55`;
-   const label = s === "All" ? "Όλα" : s;
-   return `<button class="filter-btn${isActive ? (s==="All"?" active-all":" active-status") : ""}" style="${style}" onclick="setFilter('${s}')">${label}</button>`;
- }).join("");
+
+function selM(m){
+S.view="tasks";S.month=m;S.filter="All";S.fTag=null;S.search="";
+document.getElementById("sInput").value="";
+applyRec(S.year,m);render();
 }
-function renderTasks() {
- const container = document.getElementById("taskList");
- const tasks = getTasks();
- const filtered = state.filter === "All" ? tasks : tasks.filter(t => t.status === state.filter);
- if (filtered.length === 0) {
-   container.innerHTML = `<div class="empty"><div class="icon">📋</div><div class="title">Δεν υπάρχουν tasks</div><div class="sub">Πρόσθεσε ένα νέο task για να ξεκινήσεις</div></div>`;
-   return;
- }
- container.innerHTML = `<div class="tasks">${filtered.map(t => renderTaskCard(t)).join("")}</div>`;
-}
-function renderTaskCard(task) {
- const pct = progress(task);
- const color = STATUS_COLORS[task.status] || "#94a3b8";
- const r = 16;
- const circ = 2 * Math.PI * r;
- const offset = circ * (1 - pct / 100);
- const doneSteps = task.steps.filter(s => s.done).length;
- const deadlineHtml = task.deadline ? `<span style="margin-left:10px">📅 ${formatDate(task.deadline)}</span>` : "";
- const stepsHtml = task.expanded ? `
-<div class="steps-section">
-     ${task.steps.map((step, idx) => `
-<div class="step-row" onclick="toggleStep('${task.id}','${step.id}')">
-<div class="checkbox${step.done ? " checked" : ""}"></div>
-<span class="step-text ${step.done ? "done" : "pending"}">
-<span class="step-num">${String(idx+1).padStart(2,"0")} </span>${escHtml(step.text)}
-</span>
+function gv(v){S.view=v;S.search="";document.getElementById("sInput").value="";render();}
+function chgYear(d){S.year+=d;render();}
+
+// ── RENDER TASKS ──────────────────────────────────────────────────────────────
+function renderTasks(){
+const tasks=gt();
+const allTags=[...new Set(tasks.flatMap(t=>t.tags||[]))];
+let filtered=tasks;
+if(S.filter!=="All")filtered=filtered.filter(t=>t.status===S.filter);
+if(S.fTag)filtered=filtered.filter(t=>(t.tags||[]).includes(S.fTag));
+
+const statusCounts={};SL.forEach(s=>statusCounts[s]=tasks.filter(t=>t.status===s).length);
+
+let h=`<div class="wrap">
+<div class="page-hdr">
+<div class="page-title">${MF[S.month]} ${S.year}</div>
+<div class="filters">
+${["All",...SL].map(s=>{
+const on=S.filter===s&&!S.fTag;
+const c=SC[s];const cnt=s==="All"?tasks.length:statusCounts[s];
+let st2="";
+if(on&&s==="All")st2="background:var(--surface2);color:var(--text);border-color:var(--border2)";
+else if(on)st2=`background:${c}22;color:${c};border-color:${c}44`;
+return`<button class="fbtn" style="${st2}" onclick="setF('${s}')">${s==="All"?"Όλα":s}${cnt>0?` <span style="font-size:9px;opacity:.55">${cnt}</span>`:""}</button>`;
+}).join("")}
+${allTags.length?'<div class="fsep"></div>':""}
+${allTags.map(tag=>{
+const c=tagC(tag);const on=S.fTag===tag;
+return`<button class="fbtn" style="background:${on?c+"22":"transparent"};color:${on?c:""};border-color:${on?c+"44":"var(--border)"}" onclick="setTF('${esc(tag)}')">#${esc(tag)}</button>`;
+}).join("")}
 </div>
-     `).join("")}
-</div>` : "";
- return `
-<div class="task-card" id="card-${task.id}">
-<div class="task-header" onclick="toggleExpand('${task.id}')">
-<div class="progress-circle">
-<svg width="40" height="40">
-<circle class="circle-bg" cx="20" cy="20" r="${r}"/>
-<circle class="circle-fill" cx="20" cy="20" r="${r}"
-             stroke="${color}"
-             stroke-dasharray="${circ}"
-             stroke-dashoffset="${offset}"/>
-</svg>
-<div class="circle-pct" style="color:${color}">${pct}%</div>
 </div>
-<div class="task-info">
-<div class="task-title-row">
-<span class="task-title">${escHtml(task.title)}</span>
-           ${task.category ? `<span class="tag tag-cat">${escHtml(task.category)}</span>` : ""}
-<span class="tag tag-status" style="background:${color}18;color:${color}">${task.status}</span>
+<div class="qadd">
+<input class="qi" id="qi" placeholder="Quick add: γράψε τίτλο και πάτα Enter…" onkeydown="if(event.key==='Enter')doQA()">
+<button class="qbtn" onclick="doQA()">Προσθήκη ↵</button>
+</div>`;
+
+if(!filtered.length){
+h+=`<div class="empty"><div class="empty-ico">📋</div><div class="empty-t">Δεν υπάρχουν tasks</div><div class="empty-s">Χρησιμοποίησε το Quick Add παραπάνω ή το "+ Νέο"</div></div>`;
+} else {
+h+=`<div class="tasks" id="tList">${filtered.map(t=>cardHTML(t)).join("")}</div>`;
+}
+h+=`</div>`;
+document.getElementById("ct").innerHTML=h;
+attachDrag();
+}
+
+function cardHTML(t){
+const p=pct(t),c=SC[t.status]||"#94a3b8";
+const R=15,circ=2*Math.PI*R,off=circ*(1-p/100);
+const ds=(t.steps||[]).filter(s=>s.done).length,ts=(t.steps||[]).length;
+const cc=catC(t.category);
+const tagsH=(t.tags||[]).map(tag=>{const tc=tagC(tag);return`<span class="tag" style="background:${tc}22;color:${tc};cursor:pointer" onclick="event.stopPropagation();setTF('${esc(tag)}')">#${esc(tag)}</span>`;}).join("");
+const recH=t.recurring?`<span class="tag-rec">${t.recurring==="monthly"?"↻ monthly":"↻ 2mo"}</span>`:"";
+const stepsH=t.expanded?`<div class="cexp">
+${t.notes?`<div class="cnotes">${esc(t.notes)}</div>`:""}
+<div class="csteps">${(t.steps||[]).map((s,i)=>`
+<div class="srow" onclick="togStep('${t.id}','${s.id}')">
+<div class="chk${s.done?" on":""}"><span class="chk-mk">✓</span></div>
+<span class="sidx">${String(i+1).padStart(2,"0")}</span>
+<span class="stxt ${s.done?"done":"pend"}">${esc(s.text)}</span>
+</div>`).join("")}
+</div></div>`:"";
+return`<div class="card" id="c-${t.id}" draggable="true" data-id="${t.id}">
+<div class="card-hdr" onclick="togExp('${t.id}')">
+<span class="dh" onclick="event.stopPropagation()">⠿</span>
+<div class="ring">
+<svg width="38" height="38"><circle class="rbg" cx="19" cy="19" r="${R}"/><circle class="rfill" cx="19" cy="19" r="${R}" stroke="${c}" stroke-dasharray="${circ.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}"/></svg>
+<div class="rpct" style="color:${c}">${p}%</div>
 </div>
-<div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${color}"></div></div>
-<div class="task-meta">${doneSteps}/${task.steps.length} βήματα${deadlineHtml}</div>
+<div class="cinfo">
+<div class="ctrow">
+<span class="ctitle">${esc(t.title)}</span>
+${t.category?`<span class="tag" style="background:${cc}22;color:${cc};font-weight:600">${esc(t.category)}</span>`:""}
+<span class="tag" style="background:${c}22;color:${c};font-weight:600">${t.status}</span>
+${tagsH}${recH}
+${t.deadline?dlBadge(t.deadline):""}
 </div>
-<div class="task-actions" onclick="event.stopPropagation()">
-<button class="btn-action copy" title="Αντιγραφή σε άλλο μήνα" onclick="openCopyModal('${task.id}')">⎘</button>
-<button class="btn-action edit" title="Επεξεργασία" onclick="openForm('${task.id}')">✎</button>
-<button class="btn-action del" title="Διαγραφή" onclick="deleteTask('${task.id}')">✕</button>
+<div class="cpbar"><div class="cpfill" style="width:${p}%;background:${c}"></div></div>
+<div class="cmeta">${ds}/${ts} βήματα</div>
 </div>
-<div class="chevron">${task.expanded ? "▲" : "▼"}</div>
+<div class="cacts" onclick="event.stopPropagation()">
+<button class="act" onclick="openCp('${t.id}')" title="Αντιγραφή σε άλλο μήνα">⎘</button>
+<button class="act" onclick="openForm('${t.id}')" title="Επεξεργασία">✎</button>
+<button class="act del" onclick="delTask('${t.id}')" title="Διαγραφή">✕</button>
 </div>
-     ${stepsHtml}
+<div class="chev${t.expanded?" op":""}">▼</div>
+</div>
+${stepsH}
 </div>`;
 }
-function formatDate(d) {
- if (!d) return "";
- const [y,m,day] = d.split("-");
- return `${day}/${m}/${y}`;
+
+// ── SEARCH ────────────────────────────────────────────────────────────────────
+function doSearch(q){S.search=q.trim();S.view="tasks";render();}
+function renderSearch(){
+const q=S.search.toLowerCase();
+const res={};
+Object.entries(S.data).forEach(([k,tasks])=>{
+const m=tasks.filter(t=>
+t.title.toLowerCase().includes(q)||(t.category||"").toLowerCase().includes(q)||
+(t.notes||"").toLowerCase().includes(q)||(t.tags||[]).some(tag=>tag.toLowerCase().includes(q))||
+(t.steps||[]).some(s=>s.text.toLowerCase().includes(q))
+);
+if(m.length)res[k]=m;
+});
+const total=Object.values(res).reduce((a,b)=>a+b.length,0);
+let h=`<div class="srch-res">
+<div class="srch-hdr">${total} αποτελέσματα για "<strong>${esc(S.search)}</strong>"</div>`;
+if(!total){h+=`<div class="empty"><div class="empty-ico">🔍</div><div class="empty-t">Δεν βρέθηκε τίποτα</div></div>`;}
+else{
+Object.keys(res).sort((a,b)=>b.localeCompare(a)).forEach(k=>{
+const[y,m]=k.split("-");
+h+=`<div class="srch-grp"><div class="srch-grp-lbl">${MF[+m]} ${y}</div><div class="tasks">${res[k].map(t=>cardHTML({...t,expanded:false})).join("")}</div></div>`;
+});
 }
-function escHtml(s) {
- return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+h+=`</div>`;
+document.getElementById("ct").innerHTML=h;
 }
-// ─── ACTIONS ──────────────────────────────────────────────────────────────────
-function setFilter(f) { state.filter = f; render(); }
-function changeYear(d) { state.year += d; render(); }
-function toggleExpand(id) {
- const tasks = getTasks();
- const t = tasks.find(t => t.id === id);
- if (t) t.expanded = !t.expanded;
- setTasks(tasks);
- render();
+
+// ── DASHBOARD ─────────────────────────────────────────────────────────────────
+function renderDash(){
+const yr=NOW.getFullYear();
+// Last 6 months bars
+const bars=[];
+for(let i=5;i>=0;i--){
+let m=NOW.getMonth()-i,y=yr;if(m<0){m+=12;y--;}
+const t=gt(mk(y,m));
+bars.push({lbl:MS[m],total:t.length,done:t.filter(x=>x.status==="Done").length,m,y});
 }
-function toggleStep(taskId, stepId) {
- const tasks = getTasks();
- const task = tasks.find(t => t.id === taskId);
- if (!task) return;
- const step = task.steps.find(s => s.id === stepId);
- if (!step) return;
- step.done = !step.done;
- const allDone = task.steps.every(s => s.done);
- const anyDone = task.steps.some(s => s.done);
- if (allDone) task.status = "Done";
- else if (anyDone && task.status !== "Blocked") task.status = "In Progress";
- else if (!anyDone && task.status === "Done") task.status = "In Progress";
- setTasks(tasks);
- render();
+const maxB=Math.max(...bars.map(b=>b.total),1);
+
+// Current month
+const ct2=gt();
+const stDone=ct2.filter(t=>t.status==="Done").length;
+const stProg=ct2.filter(t=>t.status==="In Progress").length;
+const stNS=ct2.filter(t=>t.status==="Not Started").length;
+const stBl=ct2.filter(t=>t.status==="Blocked").length;
+
+// Year totals
+let ytotal=0,ydone=0;
+for(let m=0;m<12;m++){const t=gt(mk(yr,m));ytotal+=t.length;ydone+=t.filter(x=>x.status==="Done").length;}
+
+// Upcoming deadlines
+const up=[];const tod=new Date().setHours(0,0,0,0);
+for(let i=0;i<3;i++){
+let m=NOW.getMonth()+i,y=yr;if(m>11){m-=12;y++;}
+gt(mk(y,m)).forEach(t=>{
+if(!t.deadline||t.status==="Done")return;
+const diff=Math.ceil((new Date(t.deadline)-tod)/86400000);
+if(diff>=0&&diff<=14)up.push({...t,diff});
+});
 }
-function deleteTask(id) {
- if (!confirm("Διαγραφή task;")) return;
- setTasks(getTasks().filter(t => t.id !== id));
- render();
- showNotif("Task διαγράφηκε");
+up.sort((a,b)=>a.diff-b.diff);
+
+// Donut
+const ddata=[
+{l:"Done",v:stDone,c:SC["Done"]},
+{l:"In Progress",v:stProg,c:SC["In Progress"]},
+{l:"Not Started",v:stNS,c:SC["Not Started"]},
+{l:"Blocked",v:stBl,c:SC["Blocked"]}
+].filter(d=>d.v>0);
+const dtot=ddata.reduce((a,b)=>a+b.v,0);
+const R2=32,cx=50,cy=50,sw=14,circ2=2*Math.PI*R2;
+let dPaths="",acc=0;
+ddata.forEach(d=>{
+const arc=circ2*(d.v/dtot);
+dPaths+=`<circle cx="${cx}" cy="${cy}" r="${R2}" fill="none" stroke="${d.c}" stroke-width="${sw}" stroke-dasharray="${arc.toFixed(2)} ${(circ2-arc).toFixed(2)}" stroke-dashoffset="${(circ2-acc).toFixed(2)}" transform="rotate(-90 ${cx} ${cy})"/>`;
+acc+=arc;
+});
+
+let h=`<div class="dash">
+<div class="dash-t">Dashboard</div>
+<div class="sgrid">
+<div class="scard"><div class="slbl">Αυτό τον μήνα</div><div class="sval">${ct2.length}</div><div class="ssub">σύνολο tasks</div></div>
+<div class="scard"><div class="slbl">Ολοκληρωμένα</div><div class="sval" style="color:var(--green)">${stDone}</div><div class="ssub">${ct2.length?Math.round(stDone/ct2.length*100):0}% του μήνα</div></div>
+<div class="scard"><div class="slbl">Σε εξέλιξη</div><div class="sval" style="color:var(--yellow)">${stProg}</div><div class="ssub">active tasks</div></div>
+<div class="scard"><div class="slbl">Φέτος (${yr})</div><div class="sval" style="color:var(--blue)">${ydone}<span style="font-size:14px;color:var(--text3)">/${ytotal}</span></div><div class="ssub">done / total</div></div>
+</div>
+<div class="cgrid">
+<div class="ccrd">
+<div class="ctit">Tasks ανά μήνα — τελευταίοι 6 μήνες</div>
+<div class="bchart">
+${bars.map(b=>{
+const hT=b.total>0?Math.round(b.total/maxB*100):0;
+const hD=b.total>0?Math.round(b.done/maxB*100):0;
+return`<div class="bcol" onclick="S.view='tasks';S.year=${b.y};S.month=${b.m};S.search='';document.getElementById('sInput').value='';render()">
+<div class="bval">${b.done}/${b.total}</div>
+<div class="btrack">
+<div class="bbg" style="height:${hT}%"></div>
+<div class="bfill" style="height:${hD}%"></div>
+</div>
+<div class="blbl">${b.lbl}</div>
+</div>`;
+}).join("")}
+</div>
+</div>
+<div class="ccrd">
+<div class="ctit">Status — ${MF[NOW.getMonth()]}</div>
+<div class="dnut">
+<svg width="100" height="100" viewBox="0 0 100 100">
+<circle cx="50" cy="50" r="32" fill="none" stroke="var(--border)" stroke-width="14"/>
+${dPaths}
+<text x="50" y="55" text-anchor="middle" font-size="15" font-weight="700" fill="var(--text)" font-family="DM Sans,sans-serif">${ct2.length}</text>
+</svg>
+<div class="dleg">
+${ddata.map(d=>`<div class="dleg-r"><div class="dleg-l"><div class="dleg-d" style="background:${d.c}"></div>${d.l}</div><span class="dleg-v">${d.v}</span></div>`).join("")}
+</div>
+</div>
+</div>
+</div>
+${up.length?`<div class="ucrd"><div class="utit">⏰ Upcoming Deadlines — επόμενες 14 ημέρες</div>
+${up.slice(0,6).map(t=>{
+const uc=t.diff<=3?"var(--red)":t.diff<=7?"var(--yellow)":"var(--text3)";
+const ub=t.diff<=3?"rgba(239,68,68,.15)":t.diff<=7?"rgba(245,158,11,.15)":"var(--surface2)";
+return`<div class="urow">
+<span class="udays" style="background:${ub};color:${uc}">${t.diff}d</span>
+<div class="uinfo"><div class="uname">${esc(t.title)}</div><div class="umeta">${t.category||"—"} · 📅 ${fmtD(t.deadline)}</div></div>
+<span class="tag" style="background:${SC[t.status]}22;color:${SC[t.status]};font-size:10px;font-weight:600">${t.status}</span>
+</div>`;
+}).join("")}
+</div>`:""}
+</div>`;
+document.getElementById("ct").innerHTML=h;
 }
-// ─── FORM ──────────────────────────────────────────────────────────────────────
-function openForm(editId) {
- state.editingId = editId || null;
- const modal = document.getElementById("formModal");
- modal.style.display = "flex";
- let task = null;
- if (editId) task = getTasks().find(t => t.id === editId);
- document.getElementById("formTitle").textContent = task ? "Επεξεργασία Task" : "Νέο Task";
- document.getElementById("btnSave").textContent = task ? "Αποθήκευση" : "Προσθήκη Task";
- document.getElementById("fTitle").value = task ? task.title : "";
- document.getElementById("fCategory").value = task ? task.category : "";
- document.getElementById("fDeadline").value = task ? task.deadline : "";
- state.formStatus = task ? task.status : "Not Started";
- renderStatusRow();
- const stepInputs = document.getElementById("stepInputs");
- stepInputs.innerHTML = "";
- state.stepCounter = 0;
- const steps = task ? task.steps : [{ id: genStepId(), text: "", done: false }];
- steps.forEach(s => addStepInput(s.text, s.id, s.done));
- document.getElementById("fTitle").oninput = updateSaveBtn;
- updateSaveBtn();
+
+// ── ACTIONS ───────────────────────────────────────────────────────────────────
+function setF(f){S.filter=f;S.fTag=null;render();}
+function setTF(t){S.fTag=S.fTag===t?null:t;render();}
+
+function togExp(id){
+const t=gt();const x=t.find(x=>x.id===id);if(x)x.expanded=!x.expanded;st(t);render();
 }
-function renderStatusRow() {
- const container = document.getElementById("statusRow");
- container.innerHTML = STATUS_LIST.map(s => {
-   const color = STATUS_COLORS[s];
-   const active = state.formStatus === s;
-   return `<button class="btn-status" onclick="setFormStatus('${s}')" style="${active ? `background:${color}25;color:${color};border-color:${color}55` : ""}">${s}</button>`;
- }).join("");
+
+function togStep(tid,sid2){
+const tasks=gt();const task=tasks.find(t=>t.id===tid);if(!task)return;
+const step=(task.steps||[]).find(s=>s.id===sid2);if(!step)return;
+step.done=!step.done;
+const all=task.steps.every(s=>s.done),any=task.steps.some(s=>s.done),was=task.status==="Done";
+if(all&&!was){task.status="Done";confetti();notif("Task ολοκληρώθηκε! 🎉","ok");}
+else if(!all&&was)task.status="In Progress";
+else if(any&&task.status==="Not Started")task.status="In Progress";
+st(tasks);render();
 }
-function setFormStatus(s) { state.formStatus = s; renderStatusRow(); }
-function addStepInput(text, id, done) {
- text = text || "";
- id = id || genStepId();
- state.stepCounter++;
- const container = document.getElementById("stepInputs");
- const div = document.createElement("div");
- div.className = "step-input-row";
- div.dataset.stepId = id;
- div.dataset.stepDone = done ? "1" : "0";
- div.innerHTML = `
-<span class="step-num-label">${state.stepCounter}.</span>
-<input class="form-input" placeholder="Βήμα..." value="${escHtml(text)}" style="flex:1">
-<button class="btn-move" onclick="moveStepInput(this,-1)">↑</button>
-<button class="btn-move" onclick="moveStepInput(this,1)">↓</button>
-<button class="btn-remove-step" onclick="removeStepInput(this)">✕</button>`;
- container.appendChild(div);
- renumberSteps();
+
+function delTask(id){
+if(!confirm("Διαγραφή αυτού του task;"))return;
+st(gt().filter(t=>t.id!==id));render();notif("Task διαγράφηκε");
 }
-function moveStepInput(btn, dir) {
- const row = btn.closest(".step-input-row");
- const parent = row.parentNode;
- const rows = Array.from(parent.children);
- const idx = rows.indexOf(row);
- const newIdx = idx + dir;
- if (newIdx < 0 || newIdx >= rows.length) return;
- if (dir === -1) parent.insertBefore(row, rows[newIdx]);
- else parent.insertBefore(rows[newIdx], row);
- renumberSteps();
+
+function doQA(){
+const el=document.getElementById("qi");if(!el)return;
+const title=el.value.trim();if(!title)return;
+const tasks=gt();
+tasks.push({id:uid(),title,category:"",deadline:"",status:"Not Started",expanded:false,notes:"",tags:[],recurring:null,steps:[]});
+st(tasks);el.value="";render();notif("Task προστέθηκε ✓","ok");
 }
-function removeStepInput(btn) {
- btn.closest(".step-input-row").remove();
- renumberSteps();
+
+// ── FORM ──────────────────────────────────────────────────────────────────────
+function openForm(eid){
+S.eid=eid||null;
+const ov=document.getElementById("fOv");ov.style.display="flex";
+const t=eid?gt().find(x=>x.id===eid):null;
+document.getElementById("fTit").textContent=t?"Επεξεργασία Task":"Νέο Task";
+document.getElementById("bSave").textContent=t?"Αποθήκευση":"Προσθήκη";
+document.getElementById("fTitle").value=t?.title||"";
+document.getElementById("fCat").value=t?.category||"";
+document.getElementById("fDl").value=t?.deadline||"";
+document.getElementById("fNotes").value=t?.notes||"";
+S.fs=t?.status||"Not Started";S.fr=t?.recurring||null;S.ftags=[...(t?.tags||[])];
+rSBtns();rRBtns();rTagsUI();
+S.fsc=0;document.getElementById("sInputs").innerHTML="";
+const steps=t?.steps?.length?t.steps:[{id:sid(),text:"",done:false}];
+steps.forEach(s=>addSI(s.text,s.id,s.done));
+updSave();
+setTimeout(()=>document.getElementById("fTitle").focus(),60);
 }
-function renumberSteps() {
- document.querySelectorAll("#stepInputs .step-input-row").forEach((row, i) => {
-   row.querySelector(".step-num-label").textContent = (i + 1) + ".";
- });
+
+function rSBtns(){
+document.getElementById("sBtns").innerHTML=SL.map(s=>{
+const c=SC[s],on=S.fs===s;
+return`<button class="sbtn" onclick="S.fs='${s}';rSBtns()" style="${on?`background:${c}22;color:${c};border-color:${c}44`:""}">${s}</button>`;
+}).join("");
 }
-function updateSaveBtn() {
- document.getElementById("btnSave").disabled = !document.getElementById("fTitle").value.trim();
+function rRBtns(){
+const opts=[{v:null,l:"Κανένα"},{v:"monthly",l:"↻ Κάθε μήνα"},{v:"bimonthly",l:"↻ Κάθε 2 μήνες"}];
+document.getElementById("rBtns").innerHTML=opts.map(o=>{
+const on=S.fr===o.v;
+return`<button class="rbtn${on?" on":""}" onclick="S.fr=${JSON.stringify(o.v)};rRBtns()">${o.l}</button>`;
+}).join("");
 }
-function saveTask() {
- const title = document.getElementById("fTitle").value.trim();
- if (!title) return;
- const category = document.getElementById("fCategory").value.trim();
- const deadline = document.getElementById("fDeadline").value;
- const stepRows = document.querySelectorAll("#stepInputs .step-input-row");
- const steps = Array.from(stepRows).map(row => ({
-   id: row.dataset.stepId,
-   text: row.querySelector("input").value.trim(),
-   done: row.dataset.stepDone === "1"
- })).filter(s => s.text);
- const tasks = getTasks();
- if (state.editingId) {
-   const idx = tasks.findIndex(t => t.id === state.editingId);
-   if (idx >= 0) {
-     tasks[idx] = { ...tasks[idx], title, category, deadline, status: state.formStatus, steps };
-   }
-   showNotif("Task ενημερώθηκε ✓");
- } else {
-   tasks.push({ id: genId(), title, category, deadline, status: state.formStatus, steps, expanded: false });
-   showNotif("Task προστέθηκε ✓");
- }
- setTasks(tasks);
- closeForm();
- render();
+function rTagsUI(){
+const w=document.getElementById("tagsW");
+const pills=S.ftags.map(t=>{const c=tagC(t);return`<span class="tp" style="background:${c}22;color:${c}">${esc(t)}<span class="tp-x" onclick="rmTag('${esc(t)}')">×</span></span>`;}).join("");
+w.innerHTML=pills+`<input class="ti" id="tagI" placeholder="${S.ftags.length?"":"Πρόσθεσε tag…"}" onkeydown="tagKey(event)">`;
 }
-function closeForm() {
- document.getElementById("formModal").style.display = "none";
- state.editingId = null;
+function tagKey(e){
+if(e.key==="Enter"||e.key===","){
+e.preventDefault();const v=e.target.value.trim().replace(/^#/,"");
+if(v&&!S.ftags.includes(v)){S.ftags.push(v);rTagsUI();}
+else if(v){e.target.value="";}
+}else if(e.key==="Backspace"&&e.target.value===""&&S.ftags.length){S.ftags.pop();rTagsUI();}
 }
-function closeFormIfOverlay(e) {
- if (e.target === document.getElementById("formModal")) closeForm();
+function rmTag(t){S.ftags=S.ftags.filter(x=>x!==t);rTagsUI();}
+
+function addSI(text,id,done){
+text=text||"";id=id||sid();done=done||false;S.fsc++;
+const c=document.getElementById("sInputs");
+const d=document.createElement("div");
+d.className="sfrow";d.dataset.sid=id;d.dataset.sdone=done?"1":"0";
+d.innerHTML=`<span class="sfnum">${S.fsc}.</span>
+<input class="fi" placeholder="Βήμα…" value="${esc(text)}" style="flex:1;padding:7px 10px">
+<button class="bsm" onclick="mvS(this,-1)">↑</button>
+<button class="bsm" onclick="mvS(this,1)">↓</button>
+<button class="bsm d" onclick="this.closest('.sfrow').remove();renumS()">✕</button>`;
+c.appendChild(d);renumS();
 }
-// ─── COPY MODAL ───────────────────────────────────────────────────────────────
-function openCopyModal(taskId) {
- state.copyTaskId = taskId;
- const nextMonth = (state.month + 1) % 12;
- const nextYear = state.month === 11 ? state.year + 1 : state.year;
- const sel = document.getElementById("copyMonth");
- sel.innerHTML = MONTHS_FULL.map((m, i) => `<option value="${i}">${m}</option>`).join("");
- sel.value = nextMonth;
- document.getElementById("copyYear").value = nextYear;
- document.getElementById("copyModal").style.display = "flex";
+function mvS(btn,dir){
+const r=btn.closest(".sfrow"),p=r.parentNode,rows=[...p.children],i=rows.indexOf(r),ni=i+dir;
+if(ni<0||ni>=rows.length)return;
+if(dir===-1)p.insertBefore(r,rows[ni]);else p.insertBefore(rows[ni],r);renumS();
 }
-function closeCopyModal() {
- document.getElementById("copyModal").style.display = "none";
- state.copyTaskId = null;
+function renumS(){document.querySelectorAll("#sInputs .sfrow").forEach((r,i)=>r.querySelector(".sfnum").textContent=(i+1)+".");}
+function updSave(){const t=document.getElementById("fTitle")?.value?.trim();const b=document.getElementById("bSave");if(b)b.disabled=!t;}
+function closeForm(){document.getElementById("fOv").style.display="none";S.eid=null;}
+function saveTask(){
+const title=document.getElementById("fTitle").value.trim();if(!title)return;
+const category=document.getElementById("fCat").value.trim();
+const deadline=document.getElementById("fDl").value;
+const notes=document.getElementById("fNotes").value.trim();
+const rows=document.querySelectorAll("#sInputs .sfrow");
+const steps=[...rows].map(r=>({id:r.dataset.sid,text:r.querySelector("input").value.trim(),done:r.dataset.sdone==="1"})).filter(s=>s.text);
+const nw={title,category,deadline,notes,status:S.fs,tags:[...S.ftags],recurring:S.fr,steps};
+const tasks=gt();
+if(S.eid){const i=tasks.findIndex(t=>t.id===S.eid);if(i>=0)tasks[i]={...tasks[i],...nw};notif("Task ενημερώθηκε ✓","ok");}
+else{tasks.push({...nw,id:uid(),expanded:false});notif("Task προστέθηκε ✓","ok");}
+st(tasks);closeForm();render();
 }
-function closeCopyIfOverlay(e) {
- if (e.target === document.getElementById("copyModal")) closeCopyModal();
+
+// ── COPY ──────────────────────────────────────────────────────────────────────
+function openCp(id){
+S.cpid=id;
+const nm=(S.month+1)%12,ny=S.month===11?S.year+1:S.year;
+const el=document.getElementById("cpM");
+el.innerHTML=MF.map((m,i)=>`<option value="${i}">${m}</option>`).join("");
+el.value=nm;document.getElementById("cpY").value=ny;
+document.getElementById("cpOv").style.display="flex";
 }
-function confirmCopy() {
- const targetMonth = parseInt(document.getElementById("copyMonth").value);
- const targetYear = parseInt(document.getElementById("copyYear").value);
- const allTasks = getTasks();
- const task = allTasks.find(t => t.id === state.copyTaskId);
- if (!task) return;
- const targetKey = getMonthKey(targetYear, targetMonth);
- const copied = {
-   ...task,
-   id: genId(),
-   expanded: false,
-   status: "Not Started",
-   steps: task.steps.map(s => ({ ...s, id: genStepId(), done: false }))
- };
- if (!state.data[targetKey]) state.data[targetKey] = [];
- state.data[targetKey].push(copied);
- saveData();
- closeCopyModal();
- render();
- showNotif(`Αντιγράφηκε στον ${MONTHS_FULL[targetMonth]} ✓`);
+function closeCp(){document.getElementById("cpOv").style.display="none";S.cpid=null;}
+function doCp(){
+const m=+document.getElementById("cpM").value,y=+document.getElementById("cpY").value;
+const task=gt().find(t=>t.id===S.cpid);if(!task)return;
+const k=mk(y,m);if(!S.data[k])S.data[k]=[];
+S.data[k].push({...task,id:uid(),expanded:false,status:"Not Started",steps:(task.steps||[]).map(s=>({...s,id:sid(),done:false}))});
+sv();closeCp();render();notif(`Αντιγράφηκε στον ${MF[m]} ✓`,"ok");
 }
-// ─── EXPORT / IMPORT ──────────────────────────────────────────────────────────
-function exportData() {
- const json = JSON.stringify(state.data, null, 2);
- const blob = new Blob([json], { type: "application/json" });
- const url = URL.createObjectURL(blob);
- const a = document.createElement("a");
- const today = new Date().toISOString().slice(0, 10);
- a.href = url;
- a.download = `tasktracker-backup-${today}.json`;
- a.click();
- URL.revokeObjectURL(url);
- showNotif("Backup αποθηκεύτηκε ✓");
+
+// ── DRAG & DROP ───────────────────────────────────────────────────────────────
+function attachDrag(){
+document.querySelectorAll(".card").forEach(card=>{
+card.addEventListener("dragstart",e=>{S.drag=card.dataset.id;card.classList.add("dragging");e.dataTransfer.effectAllowed="move";});
+card.addEventListener("dragend",()=>{card.classList.remove("dragging");document.querySelectorAll(".card").forEach(c=>c.classList.remove("drag-over"));});
+card.addEventListener("dragover",e=>{e.preventDefault();if(card.dataset.id!==S.drag){document.querySelectorAll(".card").forEach(c=>c.classList.remove("drag-over"));card.classList.add("drag-over");}});
+card.addEventListener("drop",e=>{
+e.preventDefault();if(!S.drag||card.dataset.id===S.drag)return;
+const tasks=gt(),fi=tasks.findIndex(t=>t.id===S.drag),ti=tasks.findIndex(t=>t.id===card.dataset.id);
+if(fi<0||ti<0)return;const[mv]=tasks.splice(fi,1);tasks.splice(ti,0,mv);
+st(tasks);S.drag=null;render();
+});
+});
 }
-function importData(event) {
- const file = event.target.files[0];
- if (!file) return;
- const reader = new FileReader();
- reader.onload = (e) => {
-   try {
-     const parsed = JSON.parse(e.target.result);
-     if (confirm("Θέλεις να αντικαταστήσεις όλα τα δεδομένα με αυτό το backup;")) {
-       state.data = parsed;
-       saveData();
-       render();
-       showNotif("Δεδομένα φορτώθηκαν ✓");
-     }
-   } catch {
-     alert("Μη έγκυρο αρχείο JSON.");
-   }
- };
- reader.readAsText(file);
- event.target.value = "";
+
+// ── EXPORT / IMPORT ───────────────────────────────────────────────────────────
+function exportData(){
+const blob=new Blob([JSON.stringify(S.data,null,2)],{type:"application/json"});
+const a=document.createElement("a");a.href=URL.createObjectURL(blob);
+a.download=`tasktracker-${new Date().toISOString().slice(0,10)}.json`;a.click();
+notif("Backup αποθηκεύτηκε ✓","ok");
 }
-// ─── NOTIFICATION ─────────────────────────────────────────────────────────────
-let notifTimeout;
-function showNotif(msg) {
- clearTimeout(notifTimeout);
- let el = document.querySelector(".notif");
- if (el) el.remove();
- el = document.createElement("div");
- el.className = "notif";
- el.textContent = msg;
- document.body.appendChild(el);
- notifTimeout = setTimeout(() => el && el.remove(), 2500);
+function importData(e){
+const f=e.target.files[0];if(!f)return;
+const r=new FileReader();
+r.onload=ev=>{
+try{
+const p=JSON.parse(ev.target.result);
+if(confirm("Αντικατάσταση όλων των δεδομένων;")){S.data=p;sv();render();notif("Δεδομένα φορτώθηκαν ✓","ok");}
+}catch{alert("Μη έγκυρο JSON.");}
+};
+r.readAsText(f);e.target.value="";
 }
-// ─── INIT ─────────────────────────────────────────────────────────────────────
-loadData();
-render();
+
+// ── CONFETTI ──────────────────────────────────────────────────────────────────
+function confetti(){
+const cv=document.getElementById("confetti");
+cv.style.display="block";cv.width=innerWidth;cv.height=innerHeight;
+const ctx=cv.getContext("2d");
+const cols=["#c8102e","#10b981","#f59e0b","#60a5fa","#a78bfa","#fb923c","#f472b6","#34d399"];
+const pieces=Array.from({length:130},()=>({
+x:Math.random()*cv.width,y:-20-Math.random()*cv.height*.4,
+w:5+Math.random()*9,h:3+Math.random()*5,
+col:cols[Math.floor(Math.random()*cols.length)],
+vx:Math.random()*4-2,vy:2+Math.random()*4,
+rot:Math.random()*360,rs:Math.random()*14-7,op:1
+}));
+let fr=0;
+(function anim(){
+ctx.clearRect(0,0,cv.width,cv.height);fr++;
+pieces.forEach(p=>{
+p.x+=p.vx;p.y+=p.vy;p.rot+=p.rs;if(fr>100)p.op=Math.max(0,p.op-.016);
+ctx.save();ctx.globalAlpha=p.op;ctx.translate(p.x+p.w/2,p.y+p.h/2);
+ctx.rotate(p.rot*Math.PI/180);ctx.fillStyle=p.col;ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);ctx.restore();
+});
+if(fr<185)requestAnimationFrame(anim);else{cv.style.display="none";ctx.clearRect(0,0,cv.width,cv.height);}
+})();
+}
+
+// ── NOTIFICATION ──────────────────────────────────────────────────────────────
+let ntT;
+function notif(msg,type=""){
+clearTimeout(ntT);document.querySelectorAll(".ntf").forEach(e=>e.remove());
+const el=document.createElement("div");el.className=`ntf${type?" "+type:""}`;el.textContent=msg;
+document.body.appendChild(el);ntT=setTimeout(()=>el.remove(),3200);
+}
+
+// ── KEYBOARD SHORTCUTS ────────────────────────────────────────────────────────
+document.addEventListener("keydown",e=>{
+if(e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA"||e.target.tagName==="SELECT")return;
+if(e.key==="n"||e.key==="N"){e.preventDefault();openForm();}
+if(e.key==="/"){e.preventDefault();document.getElementById("sInput")?.focus();}
+if(e.key==="Escape"){
+closeForm();closeCp();
+S.search="";document.getElementById("sInput").value="";render();
+}
+});
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+load();applyTheme();applyRec(S.year,S.month);render();
 </script>
+
 </body>
 </html>
